@@ -9,8 +9,11 @@ public class Player : MonoBehaviour
     int SpeedUp = 0;
     float Speed = 0;
     public System.Action DeadAction;
-   [SerializeField] GameManager manager;
+    public System.Action JumpAction;
+    [SerializeField] GameManager manager;
     Vector3 StartPotition;
+    bool IsAlive = false;
+
     void Start()
     {
         StartPotition = transform.position;
@@ -24,9 +27,11 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
+            if (IsAlive)
+            {
 
-            PlayerBody.velocity = new Vector2(0, SpeedUp);
-
+                Jump();
+            }
 
         }
     }
@@ -39,13 +44,23 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.tag == "pipe")
         {
-            Dead();
+            if (IsAlive)
+            {
+                Dead();
+            }
         }
 
     }
 
+
+    private void Jump()
+    {
+        PlayerBody.velocity = new Vector2(0, SpeedUp);
+        JumpAction?.Invoke();
+    }
     private void Dead()
     {
+        IsAlive = false;
         DeadAction?.Invoke();
         Speed = 0;
         SpeedUp = 0;
@@ -63,7 +78,7 @@ public class Player : MonoBehaviour
 
     void StartGame()
     {
-
+        IsAlive = true;
         PlayerBody.isKinematic = false;
 
         SpeedUp = 8;
